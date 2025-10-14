@@ -2,7 +2,6 @@ package com.example.viadapp.rest
 
 import graphql.ExecutionResult
 import kotlinx.coroutines.future.await
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -11,13 +10,10 @@ import org.springframework.web.bind.annotation.RestController
 import viaduct.service.api.ExecutionInput
 import viaduct.service.api.Viaduct
 
-const val SCHEMA_ID = "publicSchema"
-
 @RestController
-class ViaductGraphQLController {
-    @Autowired
-    lateinit var viaduct: Viaduct
-
+class ViaductGraphQLController(
+    private val viaduct: Viaduct
+) {
     @PostMapping("/graphql")
     suspend fun graphql(
         @RequestBody request: Map<String, Any>
@@ -25,7 +21,6 @@ class ViaductGraphQLController {
         val result: ExecutionResult = run {
             @Suppress("UNCHECKED_CAST")
             val executionInput = ExecutionInput.create(
-                schemaId = SCHEMA_ID,
                 operationText = request["query"] as String,
                 variables = (request["variables"] as? Map<String, Any>) ?: emptyMap(),
             )
